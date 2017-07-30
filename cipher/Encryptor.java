@@ -1,47 +1,26 @@
 package cipher;
 
-import java.io.*;
+import java.util.ArrayList;
+
 import assembler.Slice;
 
 public class Encryptor {
-	//private String file;
-	private AsymmetricCipher cipher;
+	public SymmetricCipher cipher;
 
-	public Encryptor(String file, String pass) {
-		//this.file = file;
-		cipher = new AsymmetricCipher(pass);
+	public Encryptor() {
+		cipher = new SymmetricCipher();
 	}
 
-	public void encrypt(Slice slice) {
-		File original = new File(file);
-		File crypted = new File(file + "_AES");
-		FileInputStream input = null;
-		FileOutputStream output = null;
+	public ArrayList<EncFile> encrypt(ArrayList<Slice> slices) {
+		ArrayList<EncFile> files = new ArrayList<>();
 
-		try {
-			input = new FileInputStream(original);
-			output = new FileOutputStream(crypted);
-		} catch (FileNotFoundException e) {
-			System.err.println("Can't find file: " + e);
-		}
-		DataInputStream datain = new DataInputStream(input);
-		DataOutputStream dataout = new DataOutputStream(output);
+		for (Slice slice : slices) {
+			EncFile file = new EncFile(cipher.encrypt(slice.toBytes()));
+			file.setIv(cipher.getIV());
 
-		try {
-			cipher.InitCiphers();
-			cipher.CBCEncrypt(datain, dataout);
-			System.err.println("ENCRYPTION FINISHED");
-		} catch (Exception e) {
-			System.err.println("Exception when initiating the ciphers:");
-			e.printStackTrace();
-		} finally {
-			try {
-				input.close();
-				output.close();
-			} catch (IOException e) {
-				System.err.println("IO Exception:");
-				e.printStackTrace();
-			}
+			files.add(file);
 		}
+
+		return files;
 	}
 }

@@ -11,7 +11,7 @@ public class Slice {
 		this.header = new Header(header);
 		this.header.setCount(count);
 	}
-	
+
 	public Slice(Header header) {
 		this.header = header;
 	}
@@ -38,7 +38,7 @@ public class Slice {
 	}
 
 	public static Slice fromBytes(byte[] barray) {
-		//Slice slice = null;
+		// Slice slice = null;
 		// System.out.println(barray.length);
 		ByteBuffer buffer = ByteBuffer.wrap(barray);
 		// System.out.println(barray.length);
@@ -49,7 +49,7 @@ public class Slice {
 		Slice slice = new Slice(header);
 		// ByteBuffer buffer = ByteBuffer.wrap(barray, Header.HEADER_SIZE, barray.length - Header.HEADER_SIZE);
 		buffer.get(data);
-		//System.out.println(new String(data));
+		// System.out.println(new String(data));
 		slice.setData(data);
 
 		return slice;

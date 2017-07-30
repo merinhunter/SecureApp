@@ -3,13 +3,14 @@ package main;
 //import java.nio.file.Files;
 import java.io.*;
 import java.util.ArrayList;
+//import java.util.Base64;
 import java.util.Scanner;
 
 //import org.bouncycastle.util.encoders.Hex;
 
 //import assembler.SHA512CheckSum;
 
-//import cipher.*;
+import cipher.*;
 import assembler.*;
 
 public class Main {
@@ -32,11 +33,26 @@ public class Main {
 					//Slice.fromBytes(slice.toBytes());
 				}*/
 				Composer.compose(slices);
+
+				Encryptor encryptor = new Encryptor();
+				ArrayList<EncFile> files = encryptor.encrypt(slices);
+				for (EncFile file : files) {
+					System.out.println(file.toBase64());
+				}
+				
+				Decryptor decryptor = new Decryptor(encryptor.cipher.getKey(), encryptor.cipher.getIV());
+				ArrayList<Slice> decSlices = decryptor.decrypt(files);
+				for (Slice slice : decSlices) {
+					System.out.println(slice.toString());
+				}
+				Composer.compose(decSlices);
+				
+				System.out.println("ADIOS");
 			} catch (FileNotFoundException e) {
 				System.err.println("FileNotFoundException: " + e.getMessage());
 				System.exit(-1);
 			} catch (Exception e) {
-				System.err.println("Exception: " + e.getMessage());
+				System.err.println("Exception4: " + e.getMessage());
 				System.exit(-1);
 			}
 		}
