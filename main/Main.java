@@ -6,6 +6,14 @@ import java.util.ArrayList;
 //import java.util.Base64;
 import java.util.Scanner;
 
+import com.besaba.revonline.pastebinapi.Pastebin;
+import com.besaba.revonline.pastebinapi.impl.factory.PastebinFactory;
+import com.besaba.revonline.pastebinapi.paste.Paste;
+import com.besaba.revonline.pastebinapi.paste.PasteBuilder;
+import com.besaba.revonline.pastebinapi.paste.PasteExpire;
+import com.besaba.revonline.pastebinapi.paste.PasteVisiblity;
+import com.besaba.revonline.pastebinapi.response.Response;
+
 //import org.bouncycastle.util.encoders.Hex;
 
 //import assembler.SHA512CheckSum;
@@ -14,6 +22,7 @@ import cipher.*;
 import assembler.*;
 
 public class Main {
+	private final static String devKey = "";
 
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
@@ -33,26 +42,43 @@ public class Main {
 					//Slice.fromBytes(slice.toBytes());
 				}*/
 				Composer.compose(slices);
+				
+				PastebinFactory factory = new PastebinFactory();
+				Pastebin pastebin = factory.createPastebin(devKey);
 
 				Encryptor encryptor = new Encryptor();
 				ArrayList<EncFile> files = encryptor.encrypt(slices);
 				for (EncFile file : files) {
 					System.out.println(file.toBase64());
+
+					PasteBuilder pastebuilder = factory.createPaste();
+					pastebuilder.setTitle("");
+					pastebuilder.setRaw(file.toBase64());
+					pastebuilder.setMachineFriendlyLanguage("text");
+					pastebuilder.setVisiblity(PasteVisiblity.Unlisted);
+					pastebuilder.setExpire(PasteExpire.OneDay);
+
+					Paste paste = pastebuilder.build();
+					Response<String> postResult = pastebin.post(paste);
+					if(postResult.hasError())
+						System.out.println("ERROR: " + postResult.getError());
+
+					System.out.print("Paste published! Url: " + postResult.get());
 				}
-				
-				Decryptor decryptor = new Decryptor(encryptor.cipher.getKey(), encryptor.cipher.getIV());
+
+				/*Decryptor decryptor = new Decryptor(encryptor.cipher.getKey(), encryptor.cipher.getIV());
 				ArrayList<Slice> decSlices = decryptor.decrypt(files);
 				for (Slice slice : decSlices) {
 					System.out.println(slice.toString());
 				}
-				Composer.compose(decSlices);
-				
-				System.out.println("ADIOS");
+				Composer.compose(decSlices);*/
+
+				System.out.println("BYE");
 			} catch (FileNotFoundException e) {
 				System.err.println("FileNotFoundException: " + e.getMessage());
 				System.exit(-1);
 			} catch (Exception e) {
-				System.err.println("Exception4: " + e.getMessage());
+				System.err.println("Exception: " + e.getMessage());
 				System.exit(-1);
 			}
 		}
