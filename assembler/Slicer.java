@@ -1,88 +1,64 @@
 package assembler;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Slicer {
 	private File file;
-	private int size_b;
+	private int blockSize;
 	private Header header;
-	//private int counter = 0;
-	//private FileInputStream input;
 
-	public Slicer(File f, int size_b) throws FileNotFoundException, Exception {
+	public Slicer(File f, int blockSize) throws FileNotFoundException, Exception {
 		this.file = f;
-		this.size_b = size_b;
-		this.header = new Header(getBlocks(), file);
-		//input = new FileInputStream(file);
+		this.blockSize = blockSize;
+		this.header = new Header(getBlocksNumber(), file);
 	}
 
-	public long getSize() {
+	private long getFileSize() {
 		return file.length();
 	}
 
-	public long getBlocks() {
-		long nblocks = getSize() / size_b;
+	private long getBlocksNumber() {
+		long nBlocks = getFileSize() / blockSize;
 
-		if (getSize() % size_b != 0)
-			nblocks++;
+		if (getFileSize() % blockSize != 0)
+			nBlocks++;
 
-		return nblocks;
+		return nBlocks;
 	}
 
 	public ArrayList<Slice> slice() throws FileNotFoundException {
 		ArrayList<Slice> slices = new ArrayList<>();
-		long nblocks = getBlocks();
+		long nBlocks = getBlocksNumber();
 		FileInputStream input = new FileInputStream(file);
 
 		try {
-			for (int i = 0; i < nblocks; i++) {
+			for (int i = 0; i < nBlocks; i++) {
 				Slice slice = new Slice(i, header);
-				byte[] buf = new byte[size_b];
+				byte[] buf = new byte[blockSize];
 
-				System.out.println(input.read(buf, 0, size_b));
-				//input.skip(10);
-				//System.out.println(new String(buf));
-				//System.out.println(buf.length);
+				int readed = input.read(buf, 0, blockSize);
+				slice.getHeader().setOriginalSize(readed);
+
 				slice.setData(buf);
-				//System.out.println(slice.toString());
 				slices.add(slice);
-				//input.skip(0);
 			}
 		} catch (IOException e) {
 			System.err.println("Error reading file: " + e);
 			System.exit(-1);
 		} finally {
 			try {
-				System.out.println("Cierro");
-				input.close();
+				if (input != null)
+					input.close();
+				System.out.println("Cierro lectura");
 			} catch (IOException e) {
 				System.err.println("IO Exception closing files:");
 				e.printStackTrace();
 			}
 		}
-
-		/*Slice slice = new Slice(counter, header);
-		byte[] buf = new byte[size_b];
-		int bytes_readed = 0;
-
-		try {
-			System.out.println(bytes_readed = input.read(buf, 0, buf.length));
-			counter++;
-			slice.setData(buf);
-		} catch (IOException e) {
-			System.err.println("Error reading file: " + e);
-		} finally {
-			try {
-				if (bytes_readed < buf.length) {
-					System.out.println("Cierro");
-					input.close();
-				}
-			} catch (IOException e) {
-				System.err.println("IO Exception closing files:");
-				e.printStackTrace();
-			}
-		}*/
 
 		return slices;
 	}

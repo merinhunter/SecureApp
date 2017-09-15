@@ -31,8 +31,10 @@ public class Main {
 
 		System.out.print("Put file path: ");
 
-		String path = sc.nextLine();
+		//String path = sc.nextLine();
 		
+		String path = "/home/sergio/Escritorio/prueba";
+
 		File f = new File(path);
 		if(f.exists() && !f.isDirectory()) {
 			try {
@@ -40,10 +42,12 @@ public class Main {
 				ArrayList<Slice> slices = slicer.slice();
 				for (Slice slice : slices) {
 					System.out.println(slice.toString());
-					System.out.println(Slice.fromBytes(slice.toBytes()).toString());
+					//System.out.println(Slice.fromBytes(slice.toBytes()).toString());
 					//Slice.fromBytes(slice.toBytes());
 				}
-				Composer.compose(slices);
+				
+				File f2 = new File("/home/sergio/Escritorio/pepe");
+				//Composer.compose(slices, f2);
 
 				Encryptor encryptor = new Encryptor();
 				ArrayList<EncFile> files = encryptor.encrypt(slices);
@@ -52,20 +56,21 @@ public class Main {
 					System.out.println(file.getData().length);
 				}
 
-				Decryptor decryptor = new Decryptor(encryptor.cipher.getKey(), encryptor.cipher.getIV());
+				Decryptor decryptor = new Decryptor(encryptor.cipher.getKey());
 				ArrayList<Slice> decSlices = decryptor.decrypt(files);
 				for (Slice slice : decSlices) {
 					System.out.println(slice.toString());
+					//System.out.println("TRAZA");
 				}
-				Composer.compose(decSlices);
+				Composer.compose(decSlices, f2);
 
-				System.out.println("BYE");
+				/*System.out.println("BYE");
 				RSALibrary rsa = new RSALibrary();
 				RSA_PSS rsa_pss_priv = new RSA_PSS(rsa.getKey(rsa.PRIVATE_KEY_FILE));
 				byte[] S = rsa_pss_priv.sign("hola".getBytes());
 				System.out.println(Hex.toHexString(S));
 				RSA_PSS rsa_pss_pub = new RSA_PSS(rsa.getKey(rsa.PUBLIC_KEY_FILE));
-				System.out.println(rsa_pss_pub.verify("hola".getBytes(), S));
+				System.out.println(rsa_pss_pub.verify("hola".getBytes(), S));*/
 			} catch (FileNotFoundException e) {
 				System.err.println("FileNotFoundException: " + e.getMessage());
 				System.exit(-1);

@@ -24,7 +24,7 @@ public class RSALibrary {
 
 	// String to hold name of the encryption algorithm.
 	public final String ALGORITHM = "RSA";
-	
+
 	// String to hold name of the security provider.
 	public final String PROVIDER = "BC";
 

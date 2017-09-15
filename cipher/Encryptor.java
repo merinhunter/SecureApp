@@ -2,21 +2,25 @@ package cipher;
 
 import java.util.ArrayList;
 
+import javax.crypto.spec.IvParameterSpec;
+
 import assembler.Slice;
 
 public class Encryptor {
 	public SymmetricCipher cipher;
+	private AESLibrary aes;
 
 	public Encryptor() {
-		cipher = new SymmetricCipher();
+		aes = new AESLibrary();
+		cipher = new SymmetricCipher(aes.generateSymmetricKey());
 	}
 
 	public ArrayList<EncFile> encrypt(ArrayList<Slice> slices) {
 		ArrayList<EncFile> files = new ArrayList<>();
 
 		for (Slice slice : slices) {
-			EncFile file = new EncFile(cipher.encrypt(slice.toBytes()));
-			file.setIv(cipher.getIV());
+			IvParameterSpec iv = aes.generateIV();
+			EncFile file = new EncFile(cipher.encrypt(slice.toBytes(), iv), iv.getIV());
 
 			files.add(file);
 		}

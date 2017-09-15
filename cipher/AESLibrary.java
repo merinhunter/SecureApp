@@ -6,7 +6,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class AESLibrary {
-	private final String ALGORITHM = "AES";
+	private final String ALGORITHM = "AES/CBC/PKCS5Padding";
 	private final int BLOCK_SIZE = 16;
 
 	private SecureRandom random;
@@ -26,12 +26,12 @@ public class AESLibrary {
 	}
 
 	public IvParameterSpec generateIV() {
-		byte ivBytes[] = new byte[BLOCK_SIZE];
+		byte[] ivBytes = new byte[BLOCK_SIZE];
 		random.nextBytes(ivBytes);
 		return new IvParameterSpec(ivBytes);
 	}
 
-	public IvParameterSpec generateIV(byte ivBytes[]) {
+	public IvParameterSpec generateIV(byte[] ivBytes) {
 		return new IvParameterSpec(ivBytes);
 	}
 }

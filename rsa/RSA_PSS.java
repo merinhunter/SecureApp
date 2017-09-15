@@ -26,6 +26,24 @@ public class RSA_PSS {
 
 	private int emBits, emLen, hLen, sLen;
 
+	public RSA_PSS(BigInteger E, BigInteger N, String hash) {
+		this.E = E;
+		this.N = N;
+
+		this.emBits = this.N.bitLength() - 1;
+		this.emLen = (int) Math.ceil(this.emBits / 8.0);
+
+		try {
+			this.md = MessageDigest.getInstance(hash, PROVIDER);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchProviderException e) {
+			e.printStackTrace();
+		}
+
+		this.hLen = md.getDigestLength();
+	}
+
 	public RSA_PSS(Key key) {
 
 		if (key instanceof RSAPrivateKey) {
@@ -62,6 +80,31 @@ public class RSA_PSS {
 	public byte[] sign(byte[] M) throws DataFormatException {
 
 		byte[] EM = EMSA_PSS_ENCODE(M);
+
+		BigInteger m = new BigInteger(1, EM);
+
+		BigInteger s = RSASP1(m);
+
+		byte[] S = Bytes.I2OSP(s, this.emLen);
+
+		return S;
+	}
+
+	/**
+	 * RSASSA-PSS-SIGN (predefined salt)
+	 * 
+	 * @param M
+	 *            Message to be signed
+	 * @param salt
+	 *            Salt used to encode
+	 * @return S Signature octet string
+	 * @throws DataFormatException
+	 */
+	public byte[] sign(byte[] M, byte[] salt) throws DataFormatException {
+
+		this.sLen = salt.length;
+
+		byte[] EM = EMSA_PSS_ENCODE(M, salt);
 
 		BigInteger m = new BigInteger(1, EM);
 
@@ -116,6 +159,48 @@ public class RSA_PSS {
 		byte[] salt = new byte[sLen];
 		SecureRandom rng = new SecureRandom();
 		rng.nextBytes(salt);
+
+		this.md.update(new byte[8]);
+		this.md.update(mHash);
+
+		byte[] H = this.md.digest(salt);
+
+		byte[] PS = new byte[emLen - sLen - hLen - 2];
+
+		byte[] DB = Bytes.concat(PS, new byte[] { (byte) 0x01 }, salt);
+
+		MGF1 mgf1 = new MGF1(this.md);
+		byte[] dbMask = mgf1.generateMask(H, emLen - hLen - 1);
+
+		byte[] maskedDB = Bytes.xor(DB, dbMask);
+
+		byte[] MASK = { (byte) 0xFF, 0x7F, 0x3F, 0x1F, 0x0F, 0x07, 0x03, 0x01 };
+		int maskBits = 8 * emLen - emBits;
+		maskedDB[0] &= MASK[maskBits];
+
+		byte[] EM = Bytes.concat(maskedDB, H, new byte[] { (byte) 0xbc });
+
+		return EM;
+	}
+
+	/**
+	 * EMSA-PSS-ENCODE (predefined salt)
+	 * 
+	 * @param M
+	 *            Message octet string to encode
+	 * @param salt
+	 *            Salt used to encode
+	 * @return EM encoded octet string message
+	 * @throws DataFormatException
+	 */
+	private byte[] EMSA_PSS_ENCODE(byte[] M, byte[] salt) throws DataFormatException {
+
+		this.md.update(M);
+		byte[] mHash = this.md.digest();
+
+		if (emLen < hLen + sLen + 2) {
+			throw new InternalError("Encoding error");
+		}
 
 		this.md.update(new byte[8]);
 		this.md.update(mHash);
