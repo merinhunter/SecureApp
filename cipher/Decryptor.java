@@ -13,7 +13,6 @@ public class Decryptor {
 	public Decryptor(byte[] keyBytes) {
 		aes = new AESLibrary();
 		cipher = new SymmetricCipher(aes.generateSymmetricKey(keyBytes));
-		//cipher = new SymmetricCipher(keyBytes);
 	}
 
 	public ArrayList<Slice> decrypt(ArrayList<EncFile> files) {
@@ -21,7 +20,6 @@ public class Decryptor {
 
 		for (EncFile file : files) {
 			IvParameterSpec iv = aes.generateIV(file.getIv());
-			System.out.println("TRAZA");
 			Slice slice = Slice.fromBytes(cipher.decrypt(file.getData(), iv));
 			slices.add(slice);
 		}

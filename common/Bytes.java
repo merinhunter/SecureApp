@@ -51,17 +51,4 @@ public class Bytes {
 		System.arraycopy(x_bytes, x_off, res_bytes, res_off, x_len);
 		return res_bytes;
 	}
-
-	/*public static boolean equals(byte[] a, byte[] b) {
-		if (a == null && b == null)
-			return true;
-
-		if (a == null ^ b == null)
-			return false;
-
-		int aLen = a.length;
-		int bLen = b.length;
-		if (aLen != bLen)
-			return false;
-	}*/
 }

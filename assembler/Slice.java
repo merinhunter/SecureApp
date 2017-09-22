@@ -27,6 +27,21 @@ public class Slice {
 		this.data = data;
 	}
 
+	private boolean isLastSlice() {
+		if (header.getIndex() == header.getnBlocks() - 1)
+			return true;
+
+		return false;
+	}
+
+	public int getOriginalSize() {
+		if (header.getFileSize() % data.length != 0)
+			if (isLastSlice())
+				return (int) header.getFileSize() % data.length;
+
+		return data.length;
+	}
+
 	public byte[] toBytes() {
 		ByteBuffer buffer = ByteBuffer.allocate(Header.HEADER_SIZE + data.length);
 

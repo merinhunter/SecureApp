@@ -40,8 +40,7 @@ public class Slicer {
 				Slice slice = new Slice(i, header);
 				byte[] buf = new byte[blockSize];
 
-				int readed = input.read(buf, 0, blockSize);
-				slice.getHeader().setOriginalSize(readed);
+				input.read(buf, 0, blockSize);
 
 				slice.setData(buf);
 				slices.add(slice);
@@ -53,7 +52,6 @@ public class Slicer {
 			try {
 				if (input != null)
 					input.close();
-				System.out.println("Cierro lectura");
 			} catch (IOException e) {
 				System.err.println("IO Exception closing files:");
 				e.printStackTrace();

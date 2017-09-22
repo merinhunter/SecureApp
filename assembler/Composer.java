@@ -8,9 +8,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import org.bouncycastle.util.encoders.Hex;
+
 public class Composer {
 
-	public static void compose(ArrayList<Slice> slices, File file) throws FileNotFoundException {
+	public static void compose(ArrayList<Slice> slices, String destPath) throws FileNotFoundException {
+		String fileName = Hex.toHexString(slices.get(0).getHeader().getHash());
+		String filePath = destPath + fileName;
+		File file = new File(filePath);
+
+		if (file.exists() || file.isDirectory()) {
+			throw new InternalError("File already exists");
+		}
+
 		FileOutputStream output = new FileOutputStream(file);
 
 		Collections.sort(slices, new Comparator<Slice>() {
@@ -22,7 +32,7 @@ public class Composer {
 
 		try {
 			for (Slice slice : slices) {
-				output.write(slice.getData(), 0, slice.getHeader().getOriginalSize());
+				output.write(slice.getData(), 0, slice.getOriginalSize());
 			}
 		} catch (IOException e) {
 			System.err.println("Error writing file: " + e);
@@ -31,7 +41,6 @@ public class Composer {
 			try {
 				if (output != null)
 					output.close();
-				System.out.println("Cierro escritura");
 			} catch (IOException e) {
 				System.err.println("IO Exception closing files:");
 				e.printStackTrace();

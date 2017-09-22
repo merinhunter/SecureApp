@@ -26,9 +26,15 @@ public class RSA_PSS {
 
 	private int emBits, emLen, hLen, sLen;
 
-	public RSA_PSS(BigInteger E, BigInteger N, String hash) {
-		this.E = E;
-		this.N = N;
+	public RSA_PSS(Key key, String hash, byte[] salt) {
+
+		if (key instanceof RSAPrivateKey) {
+			E = ((RSAPrivateKey) key).getPrivateExponent();
+			N = ((RSAPrivateKey) key).getModulus();
+		} else {
+			E = ((RSAPublicKey) key).getPublicExponent();
+			N = ((RSAPublicKey) key).getModulus();
+		}
 
 		this.emBits = this.N.bitLength() - 1;
 		this.emLen = (int) Math.ceil(this.emBits / 8.0);
@@ -42,6 +48,7 @@ public class RSA_PSS {
 		}
 
 		this.hLen = md.getDigestLength();
+		this.sLen = salt.length;
 	}
 
 	public RSA_PSS(Key key) {

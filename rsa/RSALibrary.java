@@ -6,15 +6,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 import javax.crypto.Cipher;
@@ -23,20 +27,20 @@ import javax.xml.bind.DatatypeConverter;
 public class RSALibrary {
 
 	// String to hold name of the encryption algorithm.
-	public final String ALGORITHM = "RSA";
+	public final static String ALGORITHM = "RSA";
 
 	// String to hold name of the security provider.
-	public final String PROVIDER = "BC";
+	public final static String PROVIDER = "BC";
 
 	// String to hold the name of the private key file.
-	public final String PRIVATE_KEY_FILE = "./private.key";
+	public final static String PRIVATE_KEY_FILE = "./private.key";
 
 	// String to hold name of the public key file.
-	public final String PUBLIC_KEY_FILE = "./public.key";
+	public final static String PUBLIC_KEY_FILE = "./public.key";
 
-	private final int KEY_SIZE = 4096;
+	public final static int KEY_SIZE = 4096;
 
-	private final int LINE_LENGTH = 64;
+	private final static int LINE_LENGTH = 64;
 
 	private SecureRandom random;
 
@@ -44,7 +48,7 @@ public class RSALibrary {
 		random = new SecureRandom();
 	}
 
-	public Key getKey(String path) throws Exception {
+	public static Key getKey(String path) throws Exception {
 		Key key = null;
 		Boolean isPublic = false;
 		String base64encoded = "";
@@ -84,18 +88,18 @@ public class RSALibrary {
 
 		if (isPublic) {
 			X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
-			KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
+			KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM, PROVIDER);
 			key = keyFactory.generatePublic(keySpec);
 		} else {
 			PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-			KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
+			KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM, PROVIDER);
 			key = keyFactory.generatePrivate(keySpec);
 		}
 
 		return key;
 	}
 
-	private void saveKey(Key key, String path) throws IOException {
+	private static void saveKey(Key key, String path) throws IOException {
 		byte[] encoded = key.getEncoded();
 		String base64encoded = new String(DatatypeConverter.printBase64Binary(encoded));
 		String keyString = new String();
@@ -120,7 +124,7 @@ public class RSALibrary {
 
 	public void generateKeys() throws IOException {
 		try {
-			final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ALGORITHM);
+			final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ALGORITHM, PROVIDER);
 			keyGen.initialize(KEY_SIZE, random);
 			KeyPair keyPair = keyGen.generateKeyPair();
 
@@ -129,21 +133,40 @@ public class RSALibrary {
 
 			saveKey(pubKey, PUBLIC_KEY_FILE);
 			saveKey(privKey, PRIVATE_KEY_FILE);
-		} catch (NoSuchAlgorithmException e) {
-			System.out.println("Exception: " + e.getMessage());
+		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+			System.err.println("Exception: " + e.getMessage());
 			System.exit(-1);
 		}
 	}
 
-	public byte[] encrypt(byte[] plaintext, PublicKey key) {
+	public static Key generatePublicKey(BigInteger N, BigInteger E) throws Exception {
+		Key key = null;
+
+		RSAPublicKeySpec keySpec = new RSAPublicKeySpec(N, E);
+		KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM, PROVIDER);
+		key = keyFactory.generatePublic(keySpec);
+
+		return key;
+	}
+
+	public static Key generatePrivateKey(BigInteger N, BigInteger E) throws Exception {
+		Key key = null;
+
+		RSAPrivateKeySpec keySpec = new RSAPrivateKeySpec(N, E);
+		KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM, PROVIDER);
+		key = keyFactory.generatePrivate(keySpec);
+
+		return key;
+	}
+
+	public static byte[] encrypt(byte[] plaintext, PublicKey key) {
 		byte[] ciphertext = null;
 
 		try {
 			final Cipher cipher = Cipher.getInstance(ALGORITHM, PROVIDER);
 			cipher.init(Cipher.ENCRYPT_MODE, key);
 
-			cipher.update(plaintext);
-			ciphertext = cipher.doFinal();
+			ciphertext = cipher.doFinal(plaintext);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -151,7 +174,7 @@ public class RSALibrary {
 		return ciphertext;
 	}
 
-	public byte[] decrypt(byte[] ciphertext, PrivateKey key) {
+	public static byte[] decrypt(byte[] ciphertext, PrivateKey key) {
 		byte[] plaintext = null;
 
 		try {

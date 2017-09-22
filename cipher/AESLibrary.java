@@ -7,7 +7,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class AESLibrary {
 	private final String ALGORITHM = "AES/CBC/PKCS5Padding";
-	private final int BLOCK_SIZE = 16;
+	public final static int KEY_SIZE = 16;
 
 	private SecureRandom random;
 
@@ -16,7 +16,7 @@ public class AESLibrary {
 	}
 
 	public SecretKeySpec generateSymmetricKey() {
-		byte[] keyBytes = new byte[BLOCK_SIZE];
+		byte[] keyBytes = new byte[KEY_SIZE];
 		random.nextBytes(keyBytes);
 		return new SecretKeySpec(keyBytes, ALGORITHM);
 	}
@@ -26,7 +26,7 @@ public class AESLibrary {
 	}
 
 	public IvParameterSpec generateIV() {
-		byte[] ivBytes = new byte[BLOCK_SIZE];
+		byte[] ivBytes = new byte[KEY_SIZE];
 		random.nextBytes(ivBytes);
 		return new IvParameterSpec(ivBytes);
 	}

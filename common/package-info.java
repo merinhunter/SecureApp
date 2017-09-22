@@ -1,8 +1,6 @@
 /**
+ * This package contains common functions to many packages.
  * 
- */
-/**
- * @author sergio
- *
+ * @author Sergio Merino
  */
 package common;
