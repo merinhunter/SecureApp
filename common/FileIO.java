@@ -48,7 +48,7 @@ public class FileIO {
 
 		while (true) {
 			String fileName = random.nextString();
-			String filePath = destPath + fileName + ".sig";
+			String filePath = destPath + fileName + ".key";
 			File f = new File(filePath);
 
 			if (!f.exists() && !f.isDirectory()) {
@@ -74,7 +74,7 @@ public class FileIO {
 		Path path = null;
 
 		for (File file : listOfFiles) {
-			if (file.isFile() && !file.getName().endsWith(".sig")) {
+			if (file.isFile() && !file.getName().endsWith(".key")) {
 				path = Paths.get(file.getAbsolutePath());
 
 				byte[] data = Files.readAllBytes(path);
@@ -94,7 +94,7 @@ public class FileIO {
 		Path path = null;
 
 		for (File file : listOfFiles) {
-			if (file.isFile() && file.getName().endsWith(".sig")) {
+			if (file.isFile() && file.getName().endsWith(".key")) {
 				path = Paths.get(file.getAbsolutePath());
 				break;
 			}

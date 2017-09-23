@@ -25,4 +25,12 @@ public class SHA512CheckSum {
 
 		return digest.digest();
 	}
+
+	public static byte[] checksum(byte[] input) throws Exception {
+		MessageDigest digest = MessageDigest.getInstance("SHA-512", "BC");
+
+		digest.update(input);
+
+		return digest.digest();
+	}
 }

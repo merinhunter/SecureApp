@@ -28,13 +28,13 @@ public class DecryptCompose {
 		String decomposedPath = "/home/sergio/Escritorio/decomposed/";
 
 		try {
-			ArrayList<EncFile> files = FileIO.readEncFiles(decomposedPath);
-
 			KeyFile keyFile = FileIO.readKeyFile(decomposedPath);
 
 			Signer signer = new Signer();
 			if (!signer.verify(keyFile))
 				throw new InternalError("KeyFile invalid signature");
+
+			ArrayList<EncFile> files = FileIO.readEncFiles(decomposedPath);
 
 			Decryptor decryptor = new Decryptor(keyFile.getKey());
 

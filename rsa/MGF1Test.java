@@ -18,6 +18,7 @@ public class MGF1Test {
 	@Test
 	public void testSHA1() {
 		String expected = "1ac9075cd4";
+
 		try {
 			md = MessageDigest.getInstance("SHA-1", "BC");
 		} catch (NoSuchAlgorithmException e) {
@@ -29,8 +30,6 @@ public class MGF1Test {
 		MGF1 mgf1 = new MGF1(this.md);
 		byte[] result = mgf1.generateMask("foo".getBytes(), 5);
 
-		System.out.println(Hex.toHexString(result));
-
 		assertEquals(Hex.toHexString(result), expected);
 	}
 
@@ -40,6 +39,7 @@ public class MGF1Test {
 	@Test
 	public void testSHA256() {
 		String expected = "382576a7841021cc28fc4c0948753fb8312090cea942ea4c4e735d10dc724b155f9f6069f289d61daca0cb814502ef04eae1";
+
 		try {
 			md = MessageDigest.getInstance("SHA-256", "BC");
 		} catch (NoSuchAlgorithmException e) {
