@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import cipher.EncFile;
-import cipher.KeyFile;
+import cipher.EncKeyFile;
 
 public class FileIO {
 
@@ -16,7 +16,7 @@ public class FileIO {
 	 * Writes an ArrayList of EncFile in a specific path.
 	 */
 	public static void write(ArrayList<EncFile> files, String destPath) throws Exception {
-		RandomString random = new RandomString(8);
+		RandomString random = new RandomString();
 
 		for (EncFile file : files) {
 			FileOutputStream output;
@@ -32,7 +32,7 @@ public class FileIO {
 				}
 			}
 
-			output.write(file.toBase64(), 0, file.toBase64().length);
+			output.write(file.toBytes(), 0, file.toBytes().length);
 
 			if (output != null)
 				output.close();
@@ -42,8 +42,8 @@ public class FileIO {
 	/**
 	 * Writes a KeyFile in a specific path.
 	 */
-	public static void write(KeyFile keyFile, String destPath) throws Exception {
-		RandomString random = new RandomString(8);
+	public static void write(EncKeyFile encKeyFile, String destPath) throws Exception {
+		RandomString random = new RandomString();
 		FileOutputStream output;
 
 		while (true) {
@@ -57,7 +57,7 @@ public class FileIO {
 			}
 		}
 
-		output.write(keyFile.toBase64(), 0, keyFile.toBase64().length);
+		output.write(encKeyFile.toBytes(), 0, encKeyFile.toBytes().length);
 
 		if (output != null)
 			output.close();
@@ -78,7 +78,7 @@ public class FileIO {
 				path = Paths.get(file.getAbsolutePath());
 
 				byte[] data = Files.readAllBytes(path);
-				files.add(EncFile.fromBase64(data));
+				files.add(EncFile.fromBytes(data));
 			}
 		}
 
@@ -88,7 +88,7 @@ public class FileIO {
 	/**
 	 * Read a KeyFile from a specific path.
 	 */
-	public static KeyFile readKeyFile(String originPath) throws Exception {
+	public static EncKeyFile readEncKeyFile(String originPath) throws Exception {
 		File folder = new File(originPath);
 		File[] listOfFiles = folder.listFiles();
 		Path path = null;
@@ -102,6 +102,6 @@ public class FileIO {
 
 		byte[] data = Files.readAllBytes(path);
 
-		return KeyFile.fromBase64(data);
+		return EncKeyFile.fromBytes(data);
 	}
 }

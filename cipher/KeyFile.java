@@ -1,46 +1,54 @@
 package cipher;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.Base64;
 
-import assembler.SHA512CheckSum;
 import common.Bytes;
+import common.RandomString;
 import rsa.RSALibrary;
 import rsa.Signature;
 
 public class KeyFile {
-	private byte[] id;
-	private byte[] encKey;
+	private byte[] key;
+	private byte[] sessionID;
 	private Signature signature;
-	public final static int KEY_FILE_SIZE = SHA512CheckSum.SHA512_SIZE + RSALibrary.KEY_SIZE / 8 + Signature.BYTES;
+	public final static int KEY_FILE_SIZE = AESLibrary.KEY_SIZE + RandomString.DEFAULT_SIZE + Signature.BYTES;
 
-	public KeyFile(byte[] id, byte[] encKey, Signature signature) {
-		this.id = id;
-		this.encKey = encKey;
+	public KeyFile(byte[] sessionID, byte[] key, Signature signature) {
+		this.sessionID = sessionID;
+		this.key = key;
 		this.signature = signature;
 	}
 
-	public KeyFile(File file, byte[] key) throws FileNotFoundException, Exception {
-		this.id = SHA512CheckSum.checksum(file);
-
-		PublicKey pubKey = (PublicKey) RSALibrary.getKey(RSALibrary.PUBLIC_KEY_FILE);
-		this.encKey = RSALibrary.encrypt(key, pubKey);
+	public KeyFile(String sessionID, byte[] key) throws FileNotFoundException, Exception {
+		this.sessionID = sessionID.getBytes();
+		this.key = key;
 	}
 
-	public byte[] getId() {
-		return id;
+	public KeyFile(EncKeyFile encKeyFile) throws Exception {
+		PrivateKey privKey = (PrivateKey) RSALibrary.getKey(RSALibrary.PRIVATE_KEY_FILE);
+		this.key = RSALibrary.decrypt(encKeyFile.getEncKey(), privKey);
+
+		AESLibrary aes = new AESLibrary();
+		SymmetricCipher cipher = new SymmetricCipher(aes.generateSymmetricKey(this.key));
+		byte[] header = cipher.decrypt(encKeyFile.getHeader(), aes.generateIV(encKeyFile.getIv()));
+
+		byte[] sessionID = new byte[RandomString.DEFAULT_SIZE];
+		System.arraycopy(header, 0, sessionID, 0, RandomString.DEFAULT_SIZE);
+		this.sessionID = sessionID;
+
+		byte[] signature = new byte[Signature.BYTES];
+		System.arraycopy(header, RandomString.DEFAULT_SIZE, signature, 0, Signature.BYTES);
+		this.signature = new Signature(signature);
+	}
+
+	public byte[] getSessionID() {
+		return sessionID;
 	}
 
 	public byte[] getKey() throws Exception {
-		PrivateKey privKey = (PrivateKey) RSALibrary.getKey(RSALibrary.PRIVATE_KEY_FILE);
-		return RSALibrary.decrypt(encKey, privKey);
-	}
-
-	public byte[] getEncKey() {
-		return encKey;
+		return key;
 	}
 
 	public Signature getSignature() {
@@ -52,21 +60,21 @@ public class KeyFile {
 	}
 
 	public byte[] toBytes() {
-		return Bytes.concat(id, encKey, signature.getSignature());
+		return Bytes.concat(key, sessionID, signature.getSignature());
 	}
 
 	public static KeyFile fromBytes(byte[] src) {
-		byte[] id = new byte[SHA512CheckSum.SHA512_SIZE];
-		byte[] encKey = new byte[RSALibrary.KEY_SIZE / 8];
+		byte[] key = new byte[AESLibrary.KEY_SIZE];
+		byte[] sessionID = new byte[RandomString.DEFAULT_SIZE];
 		byte[] byteSignature = new byte[Signature.BYTES];
 
-		System.arraycopy(src, 0, id, 0, SHA512CheckSum.SHA512_SIZE);
-		System.arraycopy(src, SHA512CheckSum.SHA512_SIZE, encKey, 0, RSALibrary.KEY_SIZE / 8);
-		System.arraycopy(src, SHA512CheckSum.SHA512_SIZE + RSALibrary.KEY_SIZE / 8, byteSignature, 0, Signature.BYTES);
+		System.arraycopy(src, 0, key, 0, AESLibrary.KEY_SIZE);
+		System.arraycopy(src, AESLibrary.KEY_SIZE, sessionID, 0, RandomString.DEFAULT_SIZE);
+		System.arraycopy(src, AESLibrary.KEY_SIZE + RandomString.DEFAULT_SIZE, byteSignature, 0, Signature.BYTES);
 
 		Signature signature = new Signature(byteSignature);
 
-		return new KeyFile(id, encKey, signature);
+		return new KeyFile(sessionID, key, signature);
 	}
 
 	public byte[] toBase64() {

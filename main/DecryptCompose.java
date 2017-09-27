@@ -1,34 +1,34 @@
 package main;
 
 import java.util.ArrayList;
-//import java.util.Scanner;
 
 import assembler.Composer;
 import assembler.Slice;
 import cipher.Decryptor;
 import cipher.EncFile;
+import cipher.EncKeyFile;
 import cipher.KeyFile;
 import common.FileIO;
 import rsa.Signer;
 
 public class DecryptCompose {
 	private final static String composedPath = "/home/sergio/Escritorio/composed/";
+	private final static String usage = "java DecryptCompose [path]";
+
+	private static String decomposedPath;
 
 	public static void main(String[] args) {
 		System.out.println("Decrypt & Compose");
 
-		/*
-		 * Scanner sc = new Scanner(System.in);
-		 * 
-		 * System.out.print("Put directory path: ");
-		 * 
-		 * String decomposedPath = sc.nextLine();
-		 */
+		if (args.length != 1)
+			throw new InternalError(usage);
 
-		String decomposedPath = "/home/sergio/Escritorio/decomposed/";
+		decomposedPath = args[0];
 
 		try {
-			KeyFile keyFile = FileIO.readKeyFile(decomposedPath);
+			EncKeyFile encKeyFile = FileIO.readEncKeyFile(decomposedPath);
+
+			KeyFile keyFile = new KeyFile(encKeyFile);
 
 			Signer signer = new Signer();
 			if (!signer.verify(keyFile))
@@ -50,8 +50,6 @@ public class DecryptCompose {
 		}
 
 		System.out.println("FINISH!");
-
-		// sc.close();
 	}
 
 }

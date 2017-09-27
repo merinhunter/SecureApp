@@ -8,12 +8,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import org.bouncycastle.util.encoders.Hex;
-
 public class Composer {
 
 	public static void compose(ArrayList<Slice> slices, String destPath) throws FileNotFoundException {
-		String fileName = Hex.toHexString(slices.get(0).getHeader().getHash());
+		String fileName = new String(slices.get(0).getHeader().getSessionID());
 		String filePath = destPath + fileName;
 		File file = new File(filePath);
 

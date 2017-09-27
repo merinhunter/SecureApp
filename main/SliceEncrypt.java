@@ -4,15 +4,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import java.util.ArrayList;
-//import java.util.Scanner;
 
 import assembler.Slice;
 import assembler.Slicer;
 import cipher.EncFile;
+import cipher.EncKeyFile;
 import cipher.Encryptor;
 import cipher.KeyFile;
 import common.FileIO;
-
+import common.RandomString;
 import rsa.Signer;
 
 public class SliceEncrypt {
@@ -20,29 +20,25 @@ public class SliceEncrypt {
 	private static int blockSize;
 
 	private final static String decomposedPath = "/home/sergio/Escritorio/decomposed/";
+	private final static String usage = "java SliceEncrypt [path] [blockSize]";
 
 	public static void main(String[] args) {
 		System.out.println("Slice & Encrypt");
 
-		/*
-		 * Scanner sc = new Scanner(System.in);
-		 * 
-		 * System.out.print("Put file path: ");
-		 * 
-		 * path = sc.nextLine();
-		 * 
-		 * System.out.println("Set block size: ");
-		 * 
-		 * blockSize = sc.nextInt();
-		 */
+		if (args.length != 2)
+			throw new InternalError(usage);
 
-		path = "/home/sergio/Escritorio/original";
-		blockSize = 10;
+		path = args[0];
+		blockSize = Integer.parseInt(args[1]);
 
 		File f = new File(path);
 		if (f.exists() && !f.isDirectory()) {
+
 			try {
-				Slicer slicer = new Slicer(f, blockSize);
+				RandomString random = new RandomString();
+				String sessionID = random.nextString();
+
+				Slicer slicer = new Slicer(f, blockSize, sessionID);
 				ArrayList<Slice> slices = slicer.slice();
 
 				Signer signer = new Signer();
@@ -51,10 +47,12 @@ public class SliceEncrypt {
 				Encryptor encryptor = new Encryptor();
 				ArrayList<EncFile> files = encryptor.encrypt(slices);
 
-				KeyFile keyFile = new KeyFile(f, encryptor.getKeyEncoded());
+				KeyFile keyFile = new KeyFile(sessionID, encryptor.getKeyEncoded());
 				signer.sign(keyFile);
 
-				FileIO.write(keyFile, decomposedPath);
+				EncKeyFile encKeyFile = new EncKeyFile(keyFile);
+
+				FileIO.write(encKeyFile, decomposedPath);
 
 				FileIO.write(files, decomposedPath);
 			} catch (FileNotFoundException e) {
@@ -64,10 +62,11 @@ public class SliceEncrypt {
 				System.err.println("Exception: " + e.getMessage());
 				System.exit(-1);
 			}
+
+		} else {
+			throw new InternalError("Specified path is not a file");
 		}
 
 		System.out.println("FINISH!");
-
-		// sc.close();
 	}
 }

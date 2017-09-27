@@ -11,10 +11,10 @@ public class Slicer {
 	private int blockSize;
 	private Header header;
 
-	public Slicer(File f, int blockSize) throws FileNotFoundException, Exception {
+	public Slicer(File f, int blockSize, String sessionID) throws FileNotFoundException, Exception {
 		this.file = f;
 		this.blockSize = blockSize;
-		this.header = new Header(getBlocksNumber(), file);
+		this.header = new Header(getBlocksNumber(), file, sessionID);
 	}
 
 	private long getFileSize() {

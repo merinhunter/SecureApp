@@ -6,26 +6,27 @@ import java.nio.ByteBuffer;
 
 import org.bouncycastle.util.encoders.Hex;
 
+import common.RandomString;
 import rsa.Signature;
 
 public class Header {
 	private int index;
 	private long nBlocks;
-	private byte[] hash;
+	private byte[] sessionID;
 	private long fileSize;
 	private Signature signature;
-	public final static int HEADER_SIZE = Integer.BYTES + Long.BYTES + SHA512CheckSum.SHA512_SIZE + Long.BYTES
+	public final static int HEADER_SIZE = Integer.BYTES + Long.BYTES + RandomString.DEFAULT_SIZE + Long.BYTES
 			+ Signature.BYTES;
 
-	public Header(long nBlocks, File file) throws FileNotFoundException, Exception {
+	public Header(long nBlocks, File file, String sessionID) throws FileNotFoundException, Exception {
 		this.nBlocks = nBlocks;
-		this.hash = SHA512CheckSum.checksum(file);
+		this.sessionID = sessionID.getBytes();
 		this.fileSize = file.length();
 	}
 
 	public Header(Header header) {
 		this.nBlocks = header.nBlocks;
-		this.hash = header.hash;
+		this.sessionID = header.sessionID;
 		this.fileSize = header.fileSize;
 	}
 
@@ -44,8 +45,8 @@ public class Header {
 		return nBlocks;
 	}
 
-	public byte[] getHash() {
-		return hash;
+	public byte[] getSessionID() {
+		return sessionID;
 	}
 
 	public long getFileSize() {
@@ -69,7 +70,7 @@ public class Header {
 
 		buffer.putInt(index);
 		buffer.putLong(nBlocks);
-		buffer.put(hash, 0, SHA512CheckSum.SHA512_SIZE);
+		buffer.put(sessionID, 0, RandomString.DEFAULT_SIZE);
 		buffer.putLong(fileSize);
 		buffer.put(signature.getSignature(), 0, Signature.BYTES);
 
@@ -78,13 +79,13 @@ public class Header {
 
 	public static Header fromBytes(ByteBuffer buffer) {
 		Header header = new Header();
-		byte[] hash = new byte[SHA512CheckSum.SHA512_SIZE];
+		byte[] sessionID = new byte[RandomString.DEFAULT_SIZE];
 		byte[] signature = new byte[Signature.BYTES];
 
 		header.index = buffer.getInt();
 		header.nBlocks = buffer.getLong();
-		buffer.get(hash);
-		header.hash = hash;
+		buffer.get(sessionID);
+		header.sessionID = sessionID;
 		header.fileSize = buffer.getLong();
 		buffer.get(signature);
 		header.signature = new Signature(signature);
@@ -96,7 +97,7 @@ public class Header {
 	public String toString() {
 		String s = "";
 
-		return s + index + "|" + nBlocks + "|" + Hex.toHexString(hash) + "|" + fileSize
+		return s + index + "|" + nBlocks + "|" + new String(sessionID) + "|" + fileSize + "|"
 				+ Hex.toHexString(signature.getSignature());
 	}
 }
