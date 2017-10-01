@@ -33,10 +33,10 @@ public class RSALibrary {
 	public final static String PROVIDER = "BC";
 
 	// String to hold the name of the private key file.
-	public final static String PRIVATE_KEY_FILE = "./private.key";
+	public final static String PRIVATE_KEY_FILE = "/home/sergio/Escritorio/keys/private.key";
 
 	// String to hold name of the public key file.
-	public final static String PUBLIC_KEY_FILE = "./public.key";
+	public final static String PUBLIC_KEY_FILE = "/home/sergio/Escritorio/keys/public.key";
 
 	public final static int KEY_SIZE = 4096;
 

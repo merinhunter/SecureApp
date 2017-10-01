@@ -20,7 +20,7 @@ public class SliceEncrypt {
 	private static int blockSize;
 
 	private final static String decomposedPath = "/home/sergio/Escritorio/decomposed/";
-	private final static String usage = "java SliceEncrypt [path] [blockSize]";
+	private final static String usage = "Usage: SliceEncrypt [path] [blockSize]";
 
 	public static void main(String[] args) {
 		System.out.println("Slice & Encrypt");

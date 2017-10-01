@@ -13,7 +13,7 @@ import rsa.Signer;
 
 public class DecryptCompose {
 	private final static String composedPath = "/home/sergio/Escritorio/composed/";
-	private final static String usage = "java DecryptCompose [path]";
+	private final static String usage = "Usage: DecryptCompose [path]";
 
 	private static String decomposedPath;
 
