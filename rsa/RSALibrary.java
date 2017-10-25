@@ -26,17 +26,23 @@ import javax.xml.bind.DatatypeConverter;
 
 public class RSALibrary {
 
-	// String to hold name of the encryption algorithm.
+	// String to hold the name of the encryption algorithm.
 	public final static String ALGORITHM = "RSA";
 
-	// String to hold name of the security provider.
+	// String to hold the name of the security provider.
 	public final static String PROVIDER = "BC";
 
+	// String to hold the name of the app home path.
+	public final static String appPath = "/home/sergio/SecureApp/";
+
+	// String to hold the name of the RSA keys path.
+	public final static String keysPath = appPath + "keys/";
+
 	// String to hold the name of the private key file.
-	public final static String PRIVATE_KEY_FILE = "/home/sergio/Escritorio/keys/private.key";
+	public final static String PRIVATE_KEY_FILE = keysPath + "private.key";
 
 	// String to hold name of the public key file.
-	public final static String PUBLIC_KEY_FILE = "/home/sergio/Escritorio/keys/public.key";
+	public final static String PUBLIC_KEY_FILE = keysPath + "public.key";
 
 	public final static int KEY_SIZE = 4096;
 

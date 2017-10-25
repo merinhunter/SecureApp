@@ -2,7 +2,6 @@ package main;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-
 import java.util.ArrayList;
 
 import assembler.Slice;
@@ -13,14 +12,17 @@ import cipher.Encryptor;
 import cipher.KeyFile;
 import common.FileIO;
 import common.RandomString;
+import rsa.RSALibrary;
 import rsa.Signer;
 
 public class SliceEncrypt {
-	private static String path;
+	private static String filePath;
 	private static int blockSize;
 
-	private final static String decomposedPath = "/home/sergio/Escritorio/decomposed/";
-	private final static String usage = "Usage: SliceEncrypt [path] [blockSize]";
+	private final static String appPath = "/home/sergio/SecureApp/";
+	private final static String sendPath = appPath + "send/";
+
+	private final static String usage = "Usage: SliceEncrypt [filePath] [blockSize]";
 
 	public static void main(String[] args) {
 		System.out.println("Slice & Encrypt");
@@ -28,20 +30,23 @@ public class SliceEncrypt {
 		if (args.length != 2)
 			throw new InternalError(usage);
 
-		path = args[0];
+		filePath = args[0];
 		blockSize = Integer.parseInt(args[1]);
 
-		File f = new File(path);
+		File f = new File(filePath);
 		if (f.exists() && !f.isDirectory()) {
 
 			try {
 				RandomString random = new RandomString();
 				String sessionID = random.nextString();
+				String sessionPath = sendPath + sessionID + "/";
+
+				FileIO.makeDirectory(sessionPath);
 
 				Slicer slicer = new Slicer(f, blockSize, sessionID);
 				ArrayList<Slice> slices = slicer.slice();
 
-				Signer signer = new Signer();
+				Signer signer = new Signer(RSALibrary.PUBLIC_KEY_FILE);
 				signer.sign(slices);
 
 				Encryptor encryptor = new Encryptor();
@@ -50,11 +55,11 @@ public class SliceEncrypt {
 				KeyFile keyFile = new KeyFile(sessionID, encryptor.getKeyEncoded());
 				signer.sign(keyFile);
 
-				EncKeyFile encKeyFile = new EncKeyFile(keyFile);
+				EncKeyFile encKeyFile = new EncKeyFile(keyFile, RSALibrary.PUBLIC_KEY_FILE);
 
-				FileIO.write(encKeyFile, decomposedPath);
+				FileIO.write(encKeyFile, sessionPath);
 
-				FileIO.write(files, decomposedPath);
+				FileIO.write(files, sessionPath);
 			} catch (FileNotFoundException e) {
 				System.err.println("FileNotFoundException: " + e.getMessage());
 				System.exit(-1);

@@ -14,7 +14,7 @@ public class Slicer {
 	public Slicer(File f, int blockSize, String sessionID) throws FileNotFoundException, Exception {
 		this.file = f;
 		this.blockSize = blockSize;
-		this.header = new Header(getBlocksNumber(), file, sessionID);
+		this.header = new Header(getBlocksNumber(), getFileSize(), sessionID);
 	}
 
 	private long getFileSize() {

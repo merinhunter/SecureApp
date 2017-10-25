@@ -1,7 +1,5 @@
 package assembler;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
 
 import org.bouncycastle.util.encoders.Hex;
@@ -18,10 +16,10 @@ public class Header {
 	public final static int HEADER_SIZE = Integer.BYTES + Long.BYTES + RandomString.DEFAULT_SIZE + Long.BYTES
 			+ Signature.BYTES;
 
-	public Header(long nBlocks, File file, String sessionID) throws FileNotFoundException, Exception {
+	public Header(long nBlocks, long fileSize, String sessionID) {
 		this.nBlocks = nBlocks;
 		this.sessionID = sessionID.getBytes();
-		this.fileSize = file.length();
+		this.fileSize = fileSize;
 	}
 
 	public Header(Header header) {
@@ -30,7 +28,7 @@ public class Header {
 		this.fileSize = header.fileSize;
 	}
 
-	public Header() {
+	private Header() {
 	}
 
 	public int getIndex() {

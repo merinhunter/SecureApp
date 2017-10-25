@@ -12,7 +12,7 @@ public class EncKeyFile {
 
 	public final static int IV_SIZE = AESLibrary.KEY_SIZE;
 
-	public EncKeyFile(KeyFile keyFile) throws Exception {
+	public EncKeyFile(KeyFile keyFile, String pubKeyPath) throws Exception {
 		AESLibrary aes = new AESLibrary();
 		SymmetricCipher cipher = new SymmetricCipher(keyFile.getKey());
 
@@ -21,7 +21,7 @@ public class EncKeyFile {
 
 		this.header = cipher.encrypt(Bytes.concat(keyFile.getSessionID(), keyFile.getSignature().getSignature()), iv);
 
-		PublicKey pubKey = (PublicKey) RSALibrary.getKey(RSALibrary.PUBLIC_KEY_FILE);
+		PublicKey pubKey = (PublicKey) RSALibrary.getKey(pubKeyPath);
 		this.encKey = RSALibrary.encrypt(keyFile.getKey(), pubKey);
 	}
 

@@ -1,6 +1,5 @@
 package cipher;
 
-import java.io.FileNotFoundException;
 import java.security.PrivateKey;
 import java.util.Base64;
 
@@ -21,7 +20,7 @@ public class KeyFile {
 		this.signature = signature;
 	}
 
-	public KeyFile(String sessionID, byte[] key) throws FileNotFoundException, Exception {
+	public KeyFile(String sessionID, byte[] key) {
 		this.sessionID = sessionID.getBytes();
 		this.key = key;
 	}

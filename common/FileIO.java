@@ -13,6 +13,19 @@ import cipher.EncKeyFile;
 public class FileIO {
 
 	/**
+	 * Creates a directory in the specified path and, if it already exists, deletes
+	 * it.
+	 */
+	public static boolean makeDirectory(String dirPath) {
+		File dir = new File(dirPath);
+
+		if (dir.exists())
+			dir.delete();
+
+		return dir.mkdir();
+	}
+
+	/**
 	 * Writes an ArrayList of EncFile in a specific path.
 	 */
 	public static void write(ArrayList<EncFile> files, String destPath) throws Exception {

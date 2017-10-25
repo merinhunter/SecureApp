@@ -9,10 +9,13 @@ import cipher.EncFile;
 import cipher.EncKeyFile;
 import cipher.KeyFile;
 import common.FileIO;
+import rsa.RSALibrary;
 import rsa.Signer;
 
 public class DecryptCompose {
+	private final static String appPath = "/home/sergio/SecureApp/";
 	private final static String composedPath = "/home/sergio/Escritorio/composed/";
+
 	private final static String usage = "Usage: DecryptCompose [path]";
 
 	private static String decomposedPath;
@@ -30,7 +33,7 @@ public class DecryptCompose {
 
 			KeyFile keyFile = new KeyFile(encKeyFile);
 
-			Signer signer = new Signer();
+			Signer signer = new Signer(RSALibrary.PUBLIC_KEY_FILE);
 			if (!signer.verify(keyFile))
 				throw new InternalError("KeyFile invalid signature");
 

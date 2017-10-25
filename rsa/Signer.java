@@ -10,9 +10,9 @@ import cipher.KeyFile;
 public class Signer {
 	private Key publicKey, privateKey;
 
-	public Signer() {
+	public Signer(String pubKeyPath) {
 		try {
-			publicKey = RSALibrary.getKey(RSALibrary.PUBLIC_KEY_FILE);
+			publicKey = RSALibrary.getKey(pubKeyPath);
 			privateKey = RSALibrary.getKey(RSALibrary.PRIVATE_KEY_FILE);
 		} catch (Exception e) {
 			System.err.println("Signer exception: " + e.getMessage());
