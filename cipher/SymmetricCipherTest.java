@@ -19,7 +19,7 @@ public class SymmetricCipherTest {
 	}
 
 	@Test
-	public void encryptWithAES() {
+	public void encryptWithAES() throws Exception {
 		byte[] message = "Alice knows Bob's secret.".getBytes();
 		AESLibrary aes = new AESLibrary();
 

@@ -13,6 +13,8 @@ public class Header {
 	private byte[] sessionID;
 	private long fileSize;
 	private Signature signature;
+	
+	public final static int ID_SIZE = RandomString.DEFAULT_SIZE;
 	public final static int HEADER_SIZE = Integer.BYTES + Long.BYTES + RandomString.DEFAULT_SIZE + Long.BYTES
 			+ Signature.BYTES;
 
@@ -68,7 +70,7 @@ public class Header {
 
 		buffer.putInt(index);
 		buffer.putLong(nBlocks);
-		buffer.put(sessionID, 0, RandomString.DEFAULT_SIZE);
+		buffer.put(sessionID, 0, ID_SIZE);
 		buffer.putLong(fileSize);
 		buffer.put(signature.getSignature(), 0, Signature.BYTES);
 
@@ -77,7 +79,7 @@ public class Header {
 
 	public static Header fromBytes(ByteBuffer buffer) {
 		Header header = new Header();
-		byte[] sessionID = new byte[RandomString.DEFAULT_SIZE];
+		byte[] sessionID = new byte[ID_SIZE];
 		byte[] signature = new byte[Signature.BYTES];
 
 		header.index = buffer.getInt();

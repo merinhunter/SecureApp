@@ -80,7 +80,7 @@ public class RSALibrary {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new Exception("Key file missing footer");
+			throw new Exception("Key file missing footer: " + path);
 		} finally {
 			reader.close();
 		}
@@ -174,7 +174,8 @@ public class RSALibrary {
 
 			ciphertext = cipher.doFinal(plaintext);
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.err.println("Failed to encrypt: " + e.getMessage());
+			return null;
 		}
 
 		return ciphertext;
@@ -189,7 +190,8 @@ public class RSALibrary {
 
 			plaintext = cipher.doFinal(ciphertext);
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.err.println("Failed to encrypt: " + e.getMessage());
+			return null;
 		}
 
 		return plaintext;

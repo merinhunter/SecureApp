@@ -2,15 +2,25 @@ package common;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
 import cipher.EncFile;
 import cipher.EncKeyFile;
 
 public class FileIO {
+	public final static String appPath = "/home/sergio/SecureApp/";
+	public final static String sendPath = appPath + "send/";
+	public final static String donePath = "done/";
+	public final static String decomposedPath = "/tmp/";
+
+	public final static String badFile = "bad.txt";
+	public final static String errorsFile = "errors.txt";
+	public final static String doneFile = "done.txt";
 
 	/**
 	 * Creates a directory in the specified path and, if it already exists, deletes
@@ -27,8 +37,10 @@ public class FileIO {
 
 	/**
 	 * Writes an ArrayList of EncFile in a specific path.
+	 * 
+	 * @throws IOException
 	 */
-	public static void write(ArrayList<EncFile> files, String destPath) throws Exception {
+	public static void write(ArrayList<EncFile> files, String destPath) throws IOException {
 		RandomString random = new RandomString();
 
 		for (EncFile file : files) {
@@ -38,6 +50,8 @@ public class FileIO {
 				String fileName = random.nextString();
 				String filePath = destPath + fileName;
 				File f = new File(filePath);
+
+				file.setID(fileName.getBytes());
 
 				if (!f.exists() && !f.isDirectory()) {
 					output = new FileOutputStream(f);
@@ -54,8 +68,10 @@ public class FileIO {
 
 	/**
 	 * Writes a KeyFile in a specific path.
+	 * 
+	 * @throws IOException
 	 */
-	public static void write(EncKeyFile encKeyFile, String destPath) throws Exception {
+	public static void write(EncKeyFile encKeyFile, String destPath) throws IOException {
 		RandomString random = new RandomString();
 		FileOutputStream output;
 
@@ -78,8 +94,10 @@ public class FileIO {
 
 	/**
 	 * Read an ArrayList of EncFile from a specific path.
+	 * 
+	 * @throws IOException
 	 */
-	public static ArrayList<EncFile> readEncFiles(String originPath) throws Exception {
+	public static ArrayList<EncFile> readEncFiles(String originPath) throws IOException {
 		ArrayList<EncFile> files = new ArrayList<>();
 
 		File folder = new File(originPath);
@@ -91,6 +109,7 @@ public class FileIO {
 				path = Paths.get(file.getAbsolutePath());
 
 				byte[] data = Files.readAllBytes(path);
+
 				files.add(EncFile.fromBytes(data));
 			}
 		}
@@ -100,8 +119,10 @@ public class FileIO {
 
 	/**
 	 * Read a KeyFile from a specific path.
+	 * 
+	 * @throws IOException
 	 */
-	public static EncKeyFile readEncKeyFile(String originPath) throws Exception {
+	public static EncKeyFile readEncKeyFile(String originPath) {
 		File folder = new File(originPath);
 		File[] listOfFiles = folder.listFiles();
 		Path path = null;
@@ -113,8 +134,30 @@ public class FileIO {
 			}
 		}
 
-		byte[] data = Files.readAllBytes(path);
+		byte[] data;
+		try {
+			data = Files.readAllBytes(path);
+		} catch (IOException e) {
+			System.err.println("Error reading EncKeyFile");
+			return null;
+		}
 
 		return EncKeyFile.fromBytes(data);
 	}
+
+	public static void append(String filePath, String m) {
+		File file = new File(filePath);
+		Path path = Paths.get(filePath);
+
+		try {
+			file.createNewFile();
+
+			Files.write(path, m.getBytes(), StandardOpenOption.APPEND);
+			Files.write(path, "\n".getBytes(), StandardOpenOption.APPEND);
+		} catch (IOException e) {
+			System.err.println("Error writing " + filePath + ": " + e.getMessage());
+			System.exit(-1);
+		}
+	}
+
 }

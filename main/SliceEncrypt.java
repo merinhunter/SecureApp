@@ -19,9 +19,6 @@ public class SliceEncrypt {
 	private static String filePath;
 	private static int blockSize;
 
-	private final static String appPath = "/home/sergio/SecureApp/";
-	private final static String sendPath = appPath + "send/";
-
 	private final static String usage = "Usage: SliceEncrypt [filePath] [blockSize]";
 
 	public static void main(String[] args) {
@@ -39,7 +36,7 @@ public class SliceEncrypt {
 			try {
 				RandomString random = new RandomString();
 				String sessionID = random.nextString();
-				String sessionPath = sendPath + sessionID + "/";
+				String sessionPath = FileIO.sendPath + sessionID + "/";
 
 				FileIO.makeDirectory(sessionPath);
 
@@ -47,7 +44,8 @@ public class SliceEncrypt {
 				ArrayList<Slice> slices = slicer.slice();
 
 				Signer signer = new Signer(RSALibrary.PUBLIC_KEY_FILE);
-				signer.sign(slices);
+				for (Slice slice : slices)
+					signer.sign(slice);
 
 				Encryptor encryptor = new Encryptor();
 				ArrayList<EncFile> files = encryptor.encrypt(slices);
@@ -69,7 +67,8 @@ public class SliceEncrypt {
 			}
 
 		} else {
-			throw new InternalError("Specified path is not a file");
+			System.err.println("Specified path is not a file");
+			System.exit(-1);
 		}
 
 		System.out.println("FINISH!");

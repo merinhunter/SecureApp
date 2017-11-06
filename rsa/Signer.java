@@ -34,6 +34,18 @@ public class Signer {
 		}
 	}
 
+	public void sign(Slice slice) {
+		RSA_PSS rsapss = new RSA_PSS(privateKey);
+
+		try {
+			Signature signature = new Signature(rsapss.sign(slice.getData()));
+			slice.getHeader().setSignature(signature);
+		} catch (DataFormatException e) {
+			System.err.println("Sign exception: " + e.getMessage());
+			System.exit(-1);
+		}
+	}
+
 	public void sign(KeyFile keyFile) {
 		RSA_PSS rsapss = new RSA_PSS(privateKey);
 
@@ -51,15 +63,30 @@ public class Signer {
 
 	public boolean verify(ArrayList<Slice> slices) {
 		RSA_PSS rsapss = new RSA_PSS(publicKey);
+		boolean result = true;
 
 		for (Slice slice : slices) {
 			try {
 				if (!rsapss.verify(slice.getData(), slice.getHeader().getSignature().getSignature()))
-					return false;
+					result = false;
 			} catch (DataFormatException e) {
 				System.err.println("Verify exception: " + e.getMessage());
 				System.exit(-1);
 			}
+		}
+
+		return result;
+	}
+
+	public boolean verify(Slice slice) {
+		RSA_PSS rsapss = new RSA_PSS(publicKey);
+
+		try {
+			if (!rsapss.verify(slice.getData(), slice.getHeader().getSignature().getSignature()))
+				return false;
+		} catch (DataFormatException e) {
+			System.err.println("Verify exception: " + e.getMessage());
+			System.exit(-1);
 		}
 
 		return true;

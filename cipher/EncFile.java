@@ -3,16 +3,33 @@ package cipher;
 import java.util.Base64;
 
 import common.Bytes;
+import common.RandomString;
 
 public class EncFile {
+	private byte[] id;
 	private byte[] iv;
 	private byte[] data;
 
+	public final static int ID_SIZE = RandomString.DEFAULT_SIZE;
 	public final static int IV_SIZE = AESLibrary.KEY_SIZE;
 
 	public EncFile(byte[] data, byte[] iv) {
 		this.data = data;
 		this.iv = iv;
+	}
+
+	public EncFile(byte[] id, byte[] data, byte[] iv) {
+		this.id = id;
+		this.data = data;
+		this.iv = iv;
+	}
+
+	public byte[] getID() {
+		return id;
+	}
+
+	public void setID(byte[] id) {
+		this.id = id;
 	}
 
 	public byte[] getIv() {
@@ -32,17 +49,19 @@ public class EncFile {
 	}
 
 	public byte[] toBytes() {
-		return Bytes.concat(iv, data);
+		return Bytes.concat(id, iv, data);
 	}
 
 	public static EncFile fromBytes(byte[] src) {
+		byte[] id = new byte[ID_SIZE];
 		byte[] iv = new byte[IV_SIZE];
-		byte[] data = new byte[src.length - IV_SIZE];
+		byte[] data = new byte[src.length - ID_SIZE - IV_SIZE];
 
-		System.arraycopy(src, 0, iv, 0, IV_SIZE);
-		System.arraycopy(src, IV_SIZE, data, 0, data.length);
+		System.arraycopy(src, 0, id, 0, ID_SIZE);
+		System.arraycopy(src, ID_SIZE, iv, 0, IV_SIZE);
+		System.arraycopy(src, ID_SIZE + IV_SIZE, data, 0, data.length);
 
-		return new EncFile(data, iv);
+		return new EncFile(id, data, iv);
 	}
 
 	public byte[] toBase64() {

@@ -26,8 +26,18 @@ public class KeyFile {
 	}
 
 	public KeyFile(EncKeyFile encKeyFile) throws Exception {
-		PrivateKey privKey = (PrivateKey) RSALibrary.getKey(RSALibrary.PRIVATE_KEY_FILE);
+		PrivateKey privKey = null;
+		try {
+			privKey = (PrivateKey) RSALibrary.getKey(RSALibrary.PRIVATE_KEY_FILE);
+		} catch (Exception e) {
+			System.err.println("Error getting the private key: " + e.getMessage());
+			System.exit(-1);
+		}
+
 		this.key = RSALibrary.decrypt(encKeyFile.getEncKey(), privKey);
+		if(key == null) {
+			throw new Exception("EncKeyFile is corrupted");
+		}
 
 		AESLibrary aes = new AESLibrary();
 		SymmetricCipher cipher = new SymmetricCipher(aes.generateSymmetricKey(this.key));
@@ -46,7 +56,7 @@ public class KeyFile {
 		return sessionID;
 	}
 
-	public byte[] getKey() throws Exception {
+	public byte[] getKey() {
 		return key;
 	}
 

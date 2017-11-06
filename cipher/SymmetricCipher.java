@@ -31,7 +31,7 @@ public class SymmetricCipher {
 			ciphertext = cipher.doFinal(plaintext);
 		} catch (Exception e) {
 			System.err.println("Encrypt exception: " + e.getMessage());
-			System.exit(-1);
+			return null;
 		}
 
 		return ciphertext;
@@ -47,7 +47,7 @@ public class SymmetricCipher {
 			plaintext = cipher.doFinal(ciphertext);
 		} catch (Exception e) {
 			System.err.println("Decrypt exception: " + e.getMessage());
-			System.exit(-1);
+			return null;
 		}
 
 		return plaintext;

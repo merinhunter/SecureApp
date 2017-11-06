@@ -1,7 +1,5 @@
 package cipher;
 
-import java.util.ArrayList;
-
 import javax.crypto.spec.IvParameterSpec;
 
 import assembler.Slice;
@@ -15,15 +13,13 @@ public class Decryptor {
 		cipher = new SymmetricCipher(aes.generateSymmetricKey(keyBytes));
 	}
 
-	public ArrayList<Slice> decrypt(ArrayList<EncFile> files) {
-		ArrayList<Slice> slices = new ArrayList<>();
+	public Slice decrypt(EncFile file) {
+		IvParameterSpec iv = aes.generateIV(file.getIv());
+		byte[] decrypted = cipher.decrypt(file.getData(), iv);
 
-		for (EncFile file : files) {
-			IvParameterSpec iv = aes.generateIV(file.getIv());
-			Slice slice = Slice.fromBytes(cipher.decrypt(file.getData(), iv));
-			slices.add(slice);
-		}
+		if (decrypted == null)
+			return null;
 
-		return slices;
+		return Slice.fromBytes(decrypted);
 	}
 }
