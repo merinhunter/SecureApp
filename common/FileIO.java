@@ -13,7 +13,7 @@ import cipher.EncFile;
 import cipher.EncKeyFile;
 
 public class FileIO {
-	public final static String appPath = "/home/sergio/SecureApp/";
+	public final static String appPath = "/home/sergio/Shatter/";
 	public final static String sendPath = appPath + "send/";
 	public final static String donePath = "done/";
 	public final static String decomposedPath = "/tmp/";
