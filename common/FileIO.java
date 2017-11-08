@@ -13,7 +13,8 @@ import cipher.EncFile;
 import cipher.EncKeyFile;
 
 public class FileIO {
-	public final static String appPath = "/home/sergio/Shatter/";
+	public final static String homePath = System.getenv("HOME");
+	public final static String appPath = homePath + "/Shatter/";
 	public final static String sendPath = appPath + "send/";
 	public final static String donePath = "done/";
 	public final static String decomposedPath = "/tmp/";
@@ -21,6 +22,7 @@ public class FileIO {
 	public final static String badFile = "bad.txt";
 	public final static String errorsFile = "errors.txt";
 	public final static String doneFile = "done.txt";
+	public final static String listFile = "list.txt";
 
 	/**
 	 * Creates a directory in the specified path and, if it already exists, deletes

@@ -24,6 +24,8 @@ import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.Cipher;
 import javax.xml.bind.DatatypeConverter;
 
+import common.FileIO;
+
 public class RSALibrary {
 
 	// String to hold the name of the encryption algorithm.
@@ -32,11 +34,8 @@ public class RSALibrary {
 	// String to hold the name of the security provider.
 	public final static String PROVIDER = "BC";
 
-	// String to hold the name of the app home path.
-	public final static String appPath = "/home/sergio/SecureApp/";
-
 	// String to hold the name of the RSA keys path.
-	public final static String keysPath = appPath + "keys/";
+	public final static String keysPath = FileIO.appPath + "keys/";
 
 	// String to hold the name of the private key file.
 	public final static String PRIVATE_KEY_FILE = keysPath + "private.key";

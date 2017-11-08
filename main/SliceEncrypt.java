@@ -40,6 +40,8 @@ public class SliceEncrypt {
 
 				FileIO.makeDirectory(sessionPath);
 
+				FileIO.append(FileIO.appPath + FileIO.listFile, sessionID + " " + filePath);
+
 				Slicer slicer = new Slicer(f, blockSize, sessionID);
 				ArrayList<Slice> slices = slicer.slice();
 
