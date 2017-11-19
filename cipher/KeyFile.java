@@ -39,7 +39,7 @@ public class KeyFile {
 			throw new Exception("EncKeyFile is corrupted");
 		}
 
-		AESLibrary aes = new AESLibrary();
+		/*AESLibrary aes = new AESLibrary();
 		SymmetricCipher cipher = new SymmetricCipher(aes.generateSymmetricKey(this.key));
 		byte[] header = cipher.decrypt(encKeyFile.getHeader(), aes.generateIV(encKeyFile.getIv()));
 
@@ -49,7 +49,10 @@ public class KeyFile {
 
 		byte[] signature = new byte[Signature.BYTES];
 		System.arraycopy(header, RandomString.DEFAULT_SIZE, signature, 0, Signature.BYTES);
-		this.signature = new Signature(signature);
+		this.signature = new Signature(signature);*/
+
+		this.sessionID = encKeyFile.getID();
+		this.signature = new Signature(encKeyFile.getSignature(), privKey);
 	}
 
 	public byte[] getSessionID() {

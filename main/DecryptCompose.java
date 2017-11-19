@@ -74,6 +74,11 @@ public class DecryptCompose {
 
 			ArrayList<Slice> slices = new ArrayList<>();
 			for (EncFile file : files) {
+				if (!signer.verify(file)) {
+					System.err.println("IV of EncFile " + new String(file.getID()) + " is corrupted");
+					bad.add("IV of EncFile " + new String(file.getID()) + " is corrupted");
+				}
+
 				Slice slice = decryptor.decrypt(file);
 
 				if (slice == null) {
@@ -91,7 +96,7 @@ public class DecryptCompose {
 			}
 
 			Composer composer = new Composer(sessionID);
-			if(!slices.isEmpty())
+			if (!slices.isEmpty())
 				composer.compose(slices);
 
 			ArrayList<String> errorsComposer = new ArrayList<>();

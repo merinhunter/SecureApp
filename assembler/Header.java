@@ -2,8 +2,6 @@ package assembler;
 
 import java.nio.ByteBuffer;
 
-import org.bouncycastle.util.encoders.Hex;
-
 import common.RandomString;
 import rsa.Signature;
 
@@ -13,7 +11,7 @@ public class Header {
 	private byte[] sessionID;
 	private long fileSize;
 	private Signature signature;
-	
+
 	public final static int ID_SIZE = RandomString.DEFAULT_SIZE;
 	public final static int HEADER_SIZE = Integer.BYTES + Long.BYTES + RandomString.DEFAULT_SIZE + Long.BYTES
 			+ Signature.BYTES;
@@ -98,6 +96,6 @@ public class Header {
 		String s = "";
 
 		return s + index + "|" + nBlocks + "|" + new String(sessionID) + "|" + fileSize + "|"
-				+ Hex.toHexString(signature.getSignature());
+				+ this.signature.toString();
 	}
 }

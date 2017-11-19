@@ -51,6 +51,8 @@ public class SliceEncrypt {
 
 				Encryptor encryptor = new Encryptor();
 				ArrayList<EncFile> files = encryptor.encrypt(slices);
+				for (EncFile file: files)
+					signer.sign(file);
 
 				KeyFile keyFile = new KeyFile(sessionID, encryptor.getKeyEncoded());
 				signer.sign(keyFile);
