@@ -4,24 +4,20 @@ import java.security.PrivateKey;
 import java.util.Base64;
 
 import common.Bytes;
-import common.RandomString;
 import rsa.RSALibrary;
 import rsa.Signature;
 
 public class KeyFile {
 	private byte[] key;
-	private byte[] sessionID;
 	private Signature signature;
-	public final static int KEY_FILE_SIZE = AESLibrary.KEY_SIZE + RandomString.DEFAULT_SIZE + Signature.BYTES;
+	public final static int KEY_FILE_SIZE = AESLibrary.KEY_SIZE + Signature.BYTES;
 
-	public KeyFile(byte[] sessionID, byte[] key, Signature signature) {
-		this.sessionID = sessionID;
+	public KeyFile(byte[] key, Signature signature) {
 		this.key = key;
 		this.signature = signature;
 	}
 
-	public KeyFile(String sessionID, byte[] key) {
-		this.sessionID = sessionID.getBytes();
+	public KeyFile(byte[] key) {
 		this.key = key;
 	}
 
@@ -51,13 +47,10 @@ public class KeyFile {
 		System.arraycopy(header, RandomString.DEFAULT_SIZE, signature, 0, Signature.BYTES);
 		this.signature = new Signature(signature);*/
 
-		this.sessionID = encKeyFile.getID();
 		this.signature = new Signature(encKeyFile.getSignature(), privKey);
 	}
 
-	public byte[] getSessionID() {
-		return sessionID;
-	}
+	
 
 	public byte[] getKey() {
 		return key;
@@ -72,21 +65,19 @@ public class KeyFile {
 	}
 
 	public byte[] toBytes() {
-		return Bytes.concat(key, sessionID, signature.getSignature());
+		return Bytes.concat(key, signature.getSignature());
 	}
 
 	public static KeyFile fromBytes(byte[] src) {
 		byte[] key = new byte[AESLibrary.KEY_SIZE];
-		byte[] sessionID = new byte[RandomString.DEFAULT_SIZE];
 		byte[] byteSignature = new byte[Signature.BYTES];
 
 		System.arraycopy(src, 0, key, 0, AESLibrary.KEY_SIZE);
-		System.arraycopy(src, AESLibrary.KEY_SIZE, sessionID, 0, RandomString.DEFAULT_SIZE);
-		System.arraycopy(src, AESLibrary.KEY_SIZE + RandomString.DEFAULT_SIZE, byteSignature, 0, Signature.BYTES);
+		System.arraycopy(src, AESLibrary.KEY_SIZE, byteSignature, 0, Signature.BYTES);
 
 		Signature signature = new Signature(byteSignature);
 
-		return new KeyFile(sessionID, key, signature);
+		return new KeyFile(key, signature);
 	}
 
 	public byte[] toBase64() {

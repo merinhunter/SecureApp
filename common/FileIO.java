@@ -111,8 +111,11 @@ public class FileIO {
 				path = Paths.get(file.getAbsolutePath());
 
 				byte[] data = Files.readAllBytes(path);
+				
+				EncFile enc_file = EncFile.fromBytes(data);
+				enc_file.setID(file.getName().getBytes());
 
-				files.add(EncFile.fromBytes(data));
+				files.add(enc_file);
 			}
 		}
 

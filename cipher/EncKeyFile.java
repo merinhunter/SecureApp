@@ -37,7 +37,6 @@ public class EncKeyFile {
 		}
 
 		this.header = new EncKeyFileHeader();
-		this.header.setID(keyFile.getSessionID());
 		this.header.setSignature(new SecureSignature(keyFile.getSignature(), pubKey));
 
 		this.encKey = RSALibrary.encrypt(keyFile.getKey(), pubKey);
@@ -62,13 +61,7 @@ public class EncKeyFile {
 		return header;
 	}*/
 
-	public byte[] getID() {
-		return this.header.getID();
-	}
-
-	public void setID(byte[] id) {
-		this.header.setID(id);
-	}
+	
 
 	public SecureSignature getSignature() {
 		return this.header.getSignature();

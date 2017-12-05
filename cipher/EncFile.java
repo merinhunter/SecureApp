@@ -6,25 +6,28 @@ import common.Bytes;
 import rsa.SecureSignature;
 
 public class EncFile {
+	private FalseHeader false_header;
 	private EncFileHeader header;
 	private byte[] data;
 
 	public EncFile(byte[] data, byte[] iv) {
 		this.data = data;
 		this.header = new EncFileHeader(iv);
+		this.false_header = new FalseHeader();
 	}
 
 	public EncFile(EncFileHeader header, byte[] data) {
-		this.header = header;
 		this.data = data;
+		this.header = header;
+		this.false_header = new FalseHeader();
 	}
 
 	public byte[] getID() {
-		return this.header.getID();
+		return this.false_header.getID();
 	}
 
 	public void setID(byte[] id) {
-		this.header.setID(id);
+		this.false_header.setID(id);
 	}
 
 	public byte[] getIv() {

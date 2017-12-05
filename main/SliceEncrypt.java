@@ -54,7 +54,7 @@ public class SliceEncrypt {
 				for (EncFile file: files)
 					signer.sign(file);
 
-				KeyFile keyFile = new KeyFile(sessionID, encryptor.getKeyEncoded());
+				KeyFile keyFile = new KeyFile(encryptor.getKeyEncoded());
 				signer.sign(keyFile);
 
 				EncKeyFile encKeyFile = new EncKeyFile(keyFile, RSALibrary.PUBLIC_KEY_FILE);
